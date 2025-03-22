@@ -95,14 +95,18 @@ $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <td><?php echo $course['min_grade']; ?></td>
             <td><?php echo implode(", ", json_decode($course['required_subjects'], true)); ?></td>
             <td>
-                <a href="#" class="edit-btn" 
-                   data-id="<?php echo $course['id']; ?>"
-                   data-name="<?php echo $course['course_name']; ?>"
-                   data-university="<?php echo $course['university']; ?>"
-                   data-grade="<?php echo $course['min_grade']; ?>"
-                   data-subjects="<?php echo implode(", ", json_decode($course['required_subjects'], true)); ?>">Edit</a>
-                <a href="manage_courses.php?delete=<?php echo $course['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')">Delete</a>
+                <div class="action-buttons">
+                    <a href="#" class="edit-btn" 
+                    data-id="<?php echo $course['id']; ?>"
+                    data-name="<?php echo $course['course_name']; ?>"
+                    data-university="<?php echo $course['university']; ?>"
+                    data-grade="<?php echo $course['min_grade']; ?>"
+                    data-subjects="<?php echo implode(", ", json_decode($course['required_subjects'], true)); ?>">Edit</a>
+                    
+                    <a href="manage_courses.php?delete=<?php echo $course['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')">Delete</a>
+                </div>
             </td>
+
         </tr>
         <?php endforeach; ?>
     </table>

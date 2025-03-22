@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE email = :email";
+    $sql = "SELECT * FROM users WHERE email = :email AND is_active = 1";
     $stmt = $conn->prepare($sql);
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch();
@@ -15,10 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_id'] = $user['id'];
         header('Location: dashboard.php');
     } else {
-        $error_message = "Invalid email or password!";
+        $error_message = "Invalid email, password, or your account is deactivated!";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

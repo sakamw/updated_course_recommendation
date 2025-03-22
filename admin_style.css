@@ -1,46 +1,46 @@
 /* KUCCPS-Inspired Admin Login */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  text-align: center;
 }
 
 .login-container {
-    width: 350px;
-    margin: 100px auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+  width: 350px;
+  margin: 100px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 }
 
 h2 {
-    color: #004a99;
+  color: #004a99;
 }
 
 input {
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 button {
-    width: 95%;
-    padding: 10px;
-    background-color: #004a99;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+  width: 95%;
+  padding: 10px;
+  background-color: #004a99;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 button:hover {
-    background-color: #002d6a;
+  background-color: #002d6a;
 }
 
 .error-message {
-    color: red;
-    font-size: 14px;
+  color: red;
+  font-size: 14px;
 }

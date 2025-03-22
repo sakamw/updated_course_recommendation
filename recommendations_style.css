@@ -1,56 +1,58 @@
 .container {
-    width: 80%;
-    margin: auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    text-align: center;
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  text-align: center;
 }
 
 h2 {
-    color: #004a99;
+  color: #004a99;
 }
 
 h3 {
-    color: #333;
+  color: #333;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-table, th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+table,
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
 th {
-    background: #004a99;
-    color: white;
+  background: #004a99;
+  color: white;
 }
 
 td {
-    background: #f9f9f9;
+  background: #f9f9f9;
 }
 
 p {
-    font-size: 18px;
-    font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 a {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 15px;
-    background: #004a99;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 15px;
+  background: #004a99;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
 }
 
 a:hover {
-    background: #002d6a;
+  background: #002d6a;
 }

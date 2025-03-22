@@ -1,156 +1,157 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 0;
 }
 
 /* Navigation Bar */
 nav {
-    background-color: #003366;
-    padding: 15px;
-    text-align: center;
+  background-color: #003366;
+  padding: 15px;
+  text-align: center;
 }
 
 nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 nav ul li {
-    display: inline;
-    margin: 0 15px;
+  display: inline;
+  margin: 0 15px;
 }
 
 nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 /* Main Container */
 .container {
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 }
 
 /* Buttons */
 button {
-    background-color: #003366;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 3px;
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 3px;
 }
 
 button:hover {
-    background-color: #0055a5;
+  background-color: #0055a5;
 }
 
 /* Form Styling */
 form {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 label {
-    font-weight: bold;
-    display: block;
-    margin: 10px 0 5px;
+  font-weight: bold;
+  display: block;
+  margin: 10px 0 5px;
 }
 
-input, select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 16px;
+input,
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 16px;
 }
 
 /* Dashboard Links */
 .dashboard-links a {
-    display: block;
-    background-color: #0055a5;
-    color: white;
-    text-align: center;
-    padding: 10px;
-    margin: 5px 0;
-    text-decoration: none;
-    border-radius: 3px;
+  display: block;
+  background-color: #0055a5;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  margin: 5px 0;
+  text-decoration: none;
+  border-radius: 3px;
 }
 
 .dashboard-links a:hover {
-    background-color: #0073e6;
+  background-color: #0073e6;
 }
 
 /* Footer */
 footer {
-    text-align: center;
-    padding: 15px;
-    background-color: #003366;
-    color: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+  text-align: center;
+  padding: 15px;
+  background-color: #003366;
+  color: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 /* Login Page Styling */
 .login-container {
-    width: 100%;
-    max-width: 400px;
-    margin: 50px auto;
-    background-color: white;
-    padding: 30px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    text-align: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 50px auto;
+  background-color: white;
+  padding: 30px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  text-align: center;
 }
 
 .login-container h2 {
-    margin-bottom: 20px;
-    color: #003366;
+  margin-bottom: 20px;
+  color: #003366;
 }
 
 .login-container input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 16px;
 }
 
 .login-container button {
-    width: 100%;
-    background-color: #003366;
-    color: white;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 3px;
+  width: 100%;
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 3px;
 }
 
 .login-container button:hover {
-    background-color: #0055a5;
+  background-color: #0055a5;
 }
 
 .login-container p {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .login-container a {
-    color: #003366;
-    text-decoration: none;
-    font-weight: bold;
+  color: #003366;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .login-container a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }

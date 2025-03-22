@@ -1,79 +1,87 @@
-/* Styling for Forms */
 form {
-    margin-bottom: 20px;
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 5px;
+  margin-bottom: 20px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
 }
 
 form input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 form button {
-    background: #004a99;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  background: #004a99;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 form button:hover {
-    background: #002a66;
+  background: #002a66;
 }
 
 /* Styling for Tables */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 th {
-    background: #004a99;
-    color: white;
+  background: #004a99;
+  color: white;
 }
 
 tr:hover {
-    background: #f1f1f1; /* Light gray on hover */
+  background: #f1f1f1;
 }
 
 /* Buttons */
-.edit-btn, .delete-btn {
-    padding: 5px 10px;
-    border-radius: 5px;
-    text-decoration: none;
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
 }
 
 .edit-btn {
-    background: #28a745;
-    color: white;
+  background: #28a745;
 }
 
 .edit-btn:hover {
-    background: #218838;
+  background: #218838;
 }
 
 .delete-btn {
-    background: red;
-    color: white;
+  background: red;
 }
 
 .delete-btn:hover {
-    background: darkred;
+  background: darkred;
 }

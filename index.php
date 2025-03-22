@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>KUCCPS-Like Course Recommendation</title>
+    <title>Course Recommendation</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
