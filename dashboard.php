@@ -67,12 +67,21 @@ if (!$user || $user['is_active'] == 0) {
            onclick="return checkResults(<?= $hasResults ? 'true' : 'false' ?>);">
            View Recommendations
         </a>
+        <form action="reset_recommendations.php" method="POST" onsubmit="return confirm('Are you sure you want to reset your recommendations? This will delete your exam results.');" style="display:inline;">
+            <button type="submit" class="reset-btn">Reset Recommendations</button>
+        </form>
     </div>
 </div>
 
 <footer>
     &copy; 2025 Course Recommendation System | Inspired by KUCCPS
 </footer>
+
+<?php if (isset($_GET['success'])): ?>
+<script>
+    alert("<?= htmlspecialchars($_GET['success']) ?>");
+</script>
+<?php endif; ?>
 
 </body>
 </html>

@@ -6,10 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id'];
     $subjects = $_POST['subjects'];
     $valid_grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'];
-
     $errors = [];
 
-    // Validate compulsory
+    // Compulsory
     $compulsory = ['Mathematics', 'English', 'Kiswahili'];
     foreach ($compulsory as $subject) {
         if (empty($subjects[$subject]) || !in_array(strtoupper($subjects[$subject]), $valid_grades)) {
@@ -17,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Validate science - at least two
+    // Sciences (min 2)
     $science = ['Biology', 'Chemistry', 'Physics'];
     $science_count = 0;
     foreach ($science as $subject) {
@@ -29,14 +28,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "You must enter at least two valid science subjects.";
     }
 
-    // Validate all filled grades
+    // Technical (min 1)
+    $technical = ['Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
+    $technical_count = 0;
+    foreach ($technical as $subject) {
+        if (!empty($subjects[$subject]) && in_array(strtoupper($subjects[$subject]), $valid_grades)) {
+            $technical_count++;
+        }
+    }
+    if ($technical_count < 1) {
+        $errors[] = "At least one technical subject is required.";
+    }
+
+    // All filled subjects must be valid and count them
+    $filled_subjects = 0;
     foreach ($subjects as $subject => $grade) {
-        if (!empty($grade) && !in_array(strtoupper($grade), $valid_grades)) {
-            $errors[] = "Invalid grade for $subject. Only grades A to E are accepted.";
+        if (!empty($grade)) {
+            $filled_subjects++;
+            if (!in_array(strtoupper($grade), $valid_grades)) {
+                $errors[] = "Invalid grade for $subject. Only grades A to E are accepted.";
+            }
         }
     }
 
-    // If no errors, insert to DB
+    // Check subject count (between 7 and 8)
+    if ($filled_subjects < 7 || $filled_subjects > 8) {
+        $errors[] = "You must enter between 7 and 8 subjects.";
+    }
+
+    // If valid, insert
     if (empty($errors)) {
         foreach ($subjects as $subject => $grade) {
             if (!empty($grade)) {
@@ -49,13 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ]);
             }
         }
-
         header('Location: recommendations.php');
         exit();
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             comp.forEach(sub => {
                 const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
                 if (!validGrades.includes(val)) {
-                    errors.push(`${sub} is required and must have a valid KCSE grade.`);
+                    errors.push(`${sub} is required and must be a valid KCSE grade.`);
                 }
             });
 
@@ -88,14 +106,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 errors.push("Please enter at least two valid science subjects.");
             }
 
-            // Check all others for invalid grade inputs
-            const allSubs = ['History', 'Geography', 'Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
-            allSubs.forEach(sub => {
+            const technicals = ['Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
+            let techCount = 0;
+            technicals.forEach(sub => {
+                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                if (validGrades.includes(val)) techCount++;
+                else if (val !== '') errors.push(`${sub} has an invalid grade.`);
+            });
+
+            if (techCount < 1) {
+                errors.push("Please enter at least one valid technical subject.");
+            }
+
+            // Humanities are optional but validate grade
+            const humanities = ['History', 'Geography'];
+            humanities.forEach(sub => {
                 const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
                 if (val !== '' && !validGrades.includes(val)) {
                     errors.push(`${sub} has an invalid grade.`);
                 }
             });
+
+            // Count total filled valid subjects
+            let totalValid = 0;
+            const allSubjects = [...comp, ...sciences, ...technicals, ...humanities];
+            allSubjects.forEach(sub => {
+                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                if (validGrades.includes(val)) totalValid++;
+            });
+
+            if (totalValid < 7 || totalValid > 8) {
+                errors.push("You must enter between 7 and 8 subjects.");
+            }
 
             if (errors.length > 0) {
                 alert(errors.join('\n'));
@@ -118,13 +160,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <h2>Enter KCSE Exam Results</h2>
 
     <?php if (!empty($errors)): ?>
-        <div class="error">
-            <ul>
-                <?php foreach ($errors as $err): ?>
-                    <li><?php echo htmlspecialchars($err); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+        <script>
+            alert("<?= implode('\n', array_map('htmlspecialchars', $errors)) ?>");
+        </script>
     <?php endif; ?>
 
     <form action="exam_results.php" method="POST" onsubmit="return validateForm();">
@@ -155,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label>Geography:</label>
         <input type="text" name="subjects[Geography]">
 
-        <h3>🛠 Technical / Group IV Subjects</h3>
+        <h3>🛠 Technical / Group IV Subjects (At least one)</h3>
         <label>Business Studies:</label>
         <input type="text" name="subjects[Business Studies]">
 
