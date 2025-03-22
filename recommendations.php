@@ -31,7 +31,9 @@ $grade_conversion = [
 // Convert student grades to numerical values
 $student_scores = [];
 foreach ($student_results as $result) {
-    $student_scores[$result['subject']] = $grade_conversion[$result['grade']];
+    $grade = strtoupper($result['grade']); // Ensure uppercase
+$student_scores[$result['subject']] = $grade_conversion[$grade] ?? 0; // Default to 0 if grade is missing
+
 }
 
 // Calculate Mean Grade (Avoid Division by Zero)

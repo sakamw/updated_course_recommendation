@@ -63,13 +63,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label>Geography:</label>
         <input type="text" name="subjects[Geography]">
 
-        <label>CRE / IRE / HRE:</label>
+        <!-- <label>CRE / IRE / HRE:</label>
         <select name="subjects[Religious Studies]">
             <option value="">--Select--</option>
             <option value="CRE">Christian Religious Education (CRE)</option>
             <option value="IRE">Islamic Religious Education (IRE)</option>
             <option value="HRE">Hindu Religious Education (HRE)</option>
-        </select>
+        </select> -->
 
         <h3>🟢 Technical / Group IV Subjects (Choose at least one)</h3>
         <label>Business Studies:</label>
