@@ -16,8 +16,10 @@ $stmt = $conn->prepare($sql);
 $stmt->execute(['user_id' => $user_id]);
 $student_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Handle no results scenario
 if (empty($student_results)) {
     echo "<p style='color:red; text-align:center;'>No KCSE results found! Please enter your grades first.</p>";
+    echo "<p style='text-align:center;'><a href='dashboard.php'>Go Back</a></p>";
     exit();
 }
 
@@ -31,13 +33,14 @@ $grade_conversion = [
 // Convert student grades to numerical values
 $student_scores = [];
 foreach ($student_results as $result) {
-    $grade = strtoupper($result['grade']); // Ensure uppercase
-$student_scores[$result['subject']] = $grade_conversion[$grade] ?? 0; // Default to 0 if grade is missing
-
+    $grade = strtoupper(trim($result['grade'])); // Ensure uppercase
+    if (isset($grade_conversion[$grade])) {
+        $student_scores[$result['subject']] = $grade_conversion[$grade];
+    }
 }
 
-// Calculate Mean Grade (Avoid Division by Zero)
-$average_score = (count($student_scores) > 0) ? array_sum($student_scores) / count($student_scores) : 0;
+// Calculate Mean Grade
+$average_score = count($student_scores) > 0 ? array_sum($student_scores) / count($student_scores) : 0;
 
 // Fetch courses from the database
 $sql = "SELECT * FROM courses";
@@ -64,7 +67,7 @@ foreach ($courses as $course) {
             $eligible = false;
             break;
         } else {
-            $subject_match_score += $student_scores[$subject]; // Give points based on subject grades
+            $subject_match_score += $student_scores[$subject];
             $matched_subjects[] = $subject;
         }
     }
@@ -90,32 +93,78 @@ foreach ($courses as $course) {
                 'course_name' => $course['course_name'],
                 'university' => $course['university']
             ];
-            $best_reason = "This course was chosen because you scored well in " . implode(", ", $matched_subjects) . 
-                ", and your mean grade meets the minimum requirement of " . $course['min_grade'] . ".";
+            $best_reason = "This course is recommended based on your performance in " . implode(", ", $matched_subjects) . 
+                " and meeting the minimum grade requirement of " . $course['min_grade'] . ".";
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Course Recommendations</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="recommendations_style.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .best-course {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+        .no-courses {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f44336;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <h2>Recommended Courses & Universities</h2>
+    <h2>Course Recommendations</h2>
 
     <?php if (empty($recommended_courses)): ?>
-        <p>No courses match your KCSE results. Try different subject combinations.</p>
+        <div class="no-courses">
+            <h3>No Matching Courses Found</h3>
+            <p>Based on your KCSE results, we couldn't find courses that match your qualifications.</p>
+            <p>Consider the following options:</p>
+            <ul>
+                <li>Explore diploma or certificate programs with different entry requirements</li>
+                <li>Consider technical and vocational training programs</li>
+                <li>Consult with an academic advisor for personalized guidance</li>
+            </ul>
+        </div>
     <?php else: ?>
-        <h3 style="color: green;">🎯 Best Recommended Course</h3>
-        <p><strong><?php echo htmlspecialchars($best_course['course_name']); ?></strong> at <strong><?php echo htmlspecialchars($best_course['university']); ?></strong></p>
-        
-        <p><strong>Reason for selection:</strong> <?php echo htmlspecialchars($best_reason); ?></p>
+        <div class="best-course">
+            <h3>Best Recommended Course</h3>
+            <p><strong><?php echo htmlspecialchars($best_course['course_name']); ?></strong> at <strong><?php echo htmlspecialchars($best_course['university']); ?></strong></p>
+            <p><?php echo htmlspecialchars($best_reason); ?></p>
+        </div>
 
         <h3>Other Eligible Courses</h3>
         <table>
@@ -132,7 +181,7 @@ foreach ($courses as $course) {
         </table>
     <?php endif; ?>
 
-    <a href="dashboard.php">Go Back</a>
+    <a href="dashboard.php" class="back-link">Back to Dashboard</a>
 </div>
 </body>
 </html>

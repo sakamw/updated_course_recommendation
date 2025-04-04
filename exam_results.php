@@ -2,16 +2,32 @@
 session_start();
 include 'db.php';
 
+// Define valid grades
+$kcse_grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'];
+
+// Function to generate a dropdown for grades
+function gradeDropdown($subject, $selected = '', $onchange = '') {
+    global $kcse_grades;
+    $html = "<select name=\"subjects[$subject]\" $onchange>";
+    $html .= "<option value=\"\">-- Select Grade --</option>";
+    foreach ($kcse_grades as $grade) {
+        $isSelected = ($selected === $grade) ? 'selected' : '';
+        $html .= "<option value=\"$grade\" $isSelected>$grade</option>";
+    }
+    $html .= "</select>";
+    return $html;
+}
+
+// Form validation and processing
+$errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id'];
     $subjects = $_POST['subjects'];
-    $valid_grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'];
-    $errors = [];
 
     // Compulsory
     $compulsory = ['Mathematics', 'English', 'Kiswahili'];
     foreach ($compulsory as $subject) {
-        if (empty($subjects[$subject]) || !in_array(strtoupper($subjects[$subject]), $valid_grades)) {
+        if (empty($subjects[$subject]) || !in_array($subjects[$subject], $kcse_grades)) {
             $errors[] = "$subject is required and must be a valid grade.";
         }
     }
@@ -20,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $science = ['Biology', 'Chemistry', 'Physics'];
     $science_count = 0;
     foreach ($science as $subject) {
-        if (!empty($subjects[$subject]) && in_array(strtoupper($subjects[$subject]), $valid_grades)) {
+        if (!empty($subjects[$subject]) && in_array($subjects[$subject], $kcse_grades)) {
             $science_count++;
         }
     }
@@ -28,35 +44,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "You must enter at least two valid science subjects.";
     }
 
-    // Technical (min 1)
+    // Technical (exactly 1)
     $technical = ['Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
     $technical_count = 0;
     foreach ($technical as $subject) {
-        if (!empty($subjects[$subject]) && in_array(strtoupper($subjects[$subject]), $valid_grades)) {
+        if (!empty($subjects[$subject]) && in_array($subjects[$subject], $kcse_grades)) {
             $technical_count++;
         }
     }
-    if ($technical_count < 1) {
-        $errors[] = "At least one technical subject is required.";
+    if ($technical_count != 1) {
+        $errors[] = "You must select exactly one technical subject.";
     }
 
-    // All filled subjects must be valid and count them
+    // Count valid grades and check range
     $filled_subjects = 0;
     foreach ($subjects as $subject => $grade) {
         if (!empty($grade)) {
-            $filled_subjects++;
-            if (!in_array(strtoupper($grade), $valid_grades)) {
-                $errors[] = "Invalid grade for $subject. Only grades A to E are accepted.";
+            if (!in_array($grade, $kcse_grades)) {
+                $errors[] = "Invalid grade for $subject.";
             }
+            $filled_subjects++;
         }
     }
 
-    // Check subject count (between 7 and 8)
     if ($filled_subjects < 7 || $filled_subjects > 8) {
         $errors[] = "You must enter between 7 and 8 subjects.";
     }
 
-    // If valid, insert
+    // Save if no errors
     if (empty($errors)) {
         foreach ($subjects as $subject => $grade) {
             if (!empty($grade)) {
@@ -65,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->execute([
                     'user_id' => $user_id,
                     'subject' => $subject,
-                    'grade' => strtoupper($grade)
+                    'grade' => $grade
                 ]);
             }
         }
@@ -82,26 +97,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="style.css">
     <script>
         function validateForm() {
-            const validGrades = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "E"];
             const form = document.forms[0];
+            const validGrades = <?= json_encode($kcse_grades) ?>;
             let errors = [];
 
             const comp = ['Mathematics', 'English', 'Kiswahili'];
             comp.forEach(sub => {
-                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                const val = form[`subjects[${sub}]`].value;
                 if (!validGrades.includes(val)) {
-                    errors.push(`${sub} is required and must be a valid KCSE grade.`);
+                    errors.push(`${sub} is required and must be a valid grade.`);
                 }
             });
 
             const sciences = ['Biology', 'Chemistry', 'Physics'];
             let sciCount = 0;
             sciences.forEach(sub => {
-                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                const val = form[`subjects[${sub}]`].value;
                 if (validGrades.includes(val)) sciCount++;
                 else if (val !== '') errors.push(`${sub} has an invalid grade.`);
             });
-
             if (sciCount < 2) {
                 errors.push("Please enter at least two valid science subjects.");
             }
@@ -109,33 +123,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const technicals = ['Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
             let techCount = 0;
             technicals.forEach(sub => {
-                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                const val = form[`subjects[${sub}]`].value;
                 if (validGrades.includes(val)) techCount++;
                 else if (val !== '') errors.push(`${sub} has an invalid grade.`);
             });
-
-            if (techCount < 1) {
-                errors.push("Please enter at least one valid technical subject.");
+            if (techCount !== 1) {
+                errors.push("Please select exactly one technical subject.");
             }
 
-            // Humanities are optional but validate grade
             const humanities = ['History', 'Geography'];
             humanities.forEach(sub => {
-                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
+                const val = form[`subjects[${sub}]`].value;
                 if (val !== '' && !validGrades.includes(val)) {
                     errors.push(`${sub} has an invalid grade.`);
                 }
             });
 
-            // Count total filled valid subjects
-            let totalValid = 0;
-            const allSubjects = [...comp, ...sciences, ...technicals, ...humanities];
-            allSubjects.forEach(sub => {
-                const val = form[`subjects[${sub}]`].value.trim().toUpperCase();
-                if (validGrades.includes(val)) totalValid++;
+            // Count all filled valid grades
+            let filled = 0;
+            [...comp, ...sciences, ...technicals, ...humanities].forEach(sub => {
+                const val = form[`subjects[${sub}]`].value;
+                if (validGrades.includes(val)) filled++;
             });
 
-            if (totalValid < 7 || totalValid > 8) {
+            if (filled < 7 || filled > 8) {
                 errors.push("You must enter between 7 and 8 subjects.");
             }
 
@@ -144,6 +155,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return false;
             }
             return true;
+        }
+
+        function checkTechnicalSubject(currentSelect) {
+            const technicals = ['Business Studies', 'Agriculture', 'Computer Studies', 'Other'];
+            const form = document.forms[0];
+            if (currentSelect.value !== "") {
+                technicals.forEach(sub => {
+                    const select = form[`subjects[${sub}]`];
+                    if (select !== currentSelect) {
+                        select.value = "";
+                    }
+                });
+            }
         }
     </script>
 </head>
@@ -168,51 +192,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <form action="exam_results.php" method="POST" onsubmit="return validateForm();">
         <h3>🟢 Compulsory Subjects</h3>
         <label>Mathematics:</label>
-        <input type="text" name="subjects[Mathematics]" required>
+        <?= gradeDropdown('Mathematics', $_POST['subjects']['Mathematics'] ?? '') ?>
 
         <label>English:</label>
-        <input type="text" name="subjects[English]" required>
+        <?= gradeDropdown('English', $_POST['subjects']['English'] ?? '') ?>
 
         <label>Kiswahili:</label>
-        <input type="text" name="subjects[Kiswahili]" required>
+        <?= gradeDropdown('Kiswahili', $_POST['subjects']['Kiswahili'] ?? '') ?>
 
         <h3>🧪 Science Subjects (Choose at least two)</h3>
         <label>Biology:</label>
-        <input type="text" name="subjects[Biology]">
+        <?= gradeDropdown('Biology', $_POST['subjects']['Biology'] ?? '') ?>
 
         <label>Chemistry:</label>
-        <input type="text" name="subjects[Chemistry]">
+        <?= gradeDropdown('Chemistry', $_POST['subjects']['Chemistry'] ?? '') ?>
 
         <label>Physics:</label>
-        <input type="text" name="subjects[Physics]">
+        <?= gradeDropdown('Physics', $_POST['subjects']['Physics'] ?? '') ?>
 
         <h3>📚 Humanities (Optional)</h3>
         <label>History:</label>
-        <input type="text" name="subjects[History]">
+        <?= gradeDropdown('History', $_POST['subjects']['History'] ?? '') ?>
 
         <label>Geography:</label>
-        <input type="text" name="subjects[Geography]">
+        <?= gradeDropdown('Geography', $_POST['subjects']['Geography'] ?? '') ?>
 
-        <h3>🛠 Technical / Group IV Subjects (At least one)</h3>
+        <h3>🛠 Technical / Group IV Subjects (Select exactly one)</h3>
         <label>Business Studies:</label>
-        <input type="text" name="subjects[Business Studies]">
+        <?= gradeDropdown('Business Studies', $_POST['subjects']['Business Studies'] ?? '', 'onchange="checkTechnicalSubject(this)"') ?>
 
         <label>Agriculture:</label>
-        <input type="text" name="subjects[Agriculture]">
+        <?= gradeDropdown('Agriculture', $_POST['subjects']['Agriculture'] ?? '', 'onchange="checkTechnicalSubject(this)"') ?>
 
         <label>Computer Studies:</label>
-        <input type="text" name="subjects[Computer Studies]">
+        <?= gradeDropdown('Computer Studies', $_POST['subjects']['Computer Studies'] ?? '', 'onchange="checkTechnicalSubject(this)"') ?>
 
         <label>Other (e.g., CRE, Home Science, Aviation):</label>
-        <input type="text" name="subjects[Other]">
+        <?= gradeDropdown('Other', $_POST['subjects']['Other'] ?? '', 'onchange="checkTechnicalSubject(this)"') ?>
 
         <button type="submit">Submit Results</button>
     </form>
-</div>
-
-<footer>
-    &copy; 2025 Course Recommendation System | Inspired by KUCCPS
-</footer>
-
-</body>
-</html>

@@ -9,25 +9,57 @@ if (!isset($_SESSION['admin_id'])) {
 
 // Add or Edit Course
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $course_name = $_POST['course_name'];
-    $university = $_POST['university'];
+    $course_name = trim($_POST['course_name']);
+    $university = trim($_POST['university']);
     $min_grade = $_POST['min_grade'];
-    $required_subjects = json_encode($_POST['required_subjects']);
+    $required_subjects_input = $_POST['required_subjects'];
+    
+    // Convert comma-separated string to array
+    $required_subjects = json_encode(array_map('trim', explode(',', $required_subjects_input)));
+
+    // Check if course already exists with same name and university
+    $checkSql = "SELECT * FROM courses WHERE course_name = :course_name AND university = :university";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->execute(['course_name' => $course_name, 'university' => $university]);
+    $existingCourse = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
     if (isset($_POST['course_id']) && $_POST['course_id'] != "") {
-        // Update existing course
+        // Updating existing course
         $course_id = $_POST['course_id'];
+
+        if ($existingCourse && $existingCourse['id'] != $course_id) {
+            echo "<script>alert('Already exists!'); window.location='manage_courses.php';</script>";
+            exit();
+        }
+
         $sql = "UPDATE courses SET course_name = :course_name, university = :university, min_grade = :min_grade, required_subjects = :required_subjects WHERE id = :id";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['course_name' => $course_name, 'university' => $university, 'min_grade' => $min_grade, 'required_subjects' => $required_subjects, 'id' => $course_id]);
+        $stmt->execute([
+            'course_name' => $course_name,
+            'university' => $university,
+            'min_grade' => $min_grade,
+            'required_subjects' => $required_subjects,
+            'id' => $course_id
+        ]);
     } else {
-        // Insert new course
+        // New course insert
+        if ($existingCourse) {
+            echo "<script>alert('Already exists!'); window.location='manage_courses.php';</script>";
+            exit();
+        }
+
         $sql = "INSERT INTO courses (course_name, university, min_grade, required_subjects) VALUES (:course_name, :university, :min_grade, :required_subjects)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['course_name' => $course_name, 'university' => $university, 'min_grade' => $min_grade, 'required_subjects' => $required_subjects]);
+        $stmt->execute([
+            'course_name' => $course_name,
+            'university' => $university,
+            'min_grade' => $min_grade,
+            'required_subjects' => $required_subjects
+        ]);
     }
 
     header("Location: manage_courses.php");
+    exit();
 }
 
 // Delete Course
@@ -37,6 +69,7 @@ if (isset($_GET['delete'])) {
     $stmt = $conn->prepare($sql);
     $stmt->execute(['id' => $course_id]);
     header("Location: manage_courses.php");
+    exit();
 }
 
 // Get All Courses
@@ -73,7 +106,7 @@ $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <input type="text" name="course_name" id="course_name" placeholder="Course Name" required>
         <input type="text" name="university" id="university" placeholder="University" required>
         <input type="text" name="min_grade" id="min_grade" placeholder="Minimum Grade" required>
-        <input type="text" name="required_subjects[]" id="required_subjects" placeholder="Required Subjects (comma separated)" required>
+        <input type="text" name="required_subjects" id="required_subjects" placeholder="Required Subjects (comma separated)" required>
         <button type="submit">Save Course</button>
     </form>
 
@@ -90,23 +123,22 @@ $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php foreach ($courses as $course): ?>
         <tr>
             <td><?php echo $course['id']; ?></td>
-            <td><?php echo $course['course_name']; ?></td>
-            <td><?php echo $course['university']; ?></td>
-            <td><?php echo $course['min_grade']; ?></td>
-            <td><?php echo implode(", ", json_decode($course['required_subjects'], true)); ?></td>
+            <td><?php echo htmlspecialchars($course['course_name']); ?></td>
+            <td><?php echo htmlspecialchars($course['university']); ?></td>
+            <td><?php echo htmlspecialchars($course['min_grade']); ?></td>
+            <td><?php echo htmlspecialchars(implode(", ", json_decode($course['required_subjects'], true))); ?></td>
             <td>
                 <div class="action-buttons">
                     <a href="#" class="edit-btn" 
-                    data-id="<?php echo $course['id']; ?>"
-                    data-name="<?php echo $course['course_name']; ?>"
-                    data-university="<?php echo $course['university']; ?>"
-                    data-grade="<?php echo $course['min_grade']; ?>"
-                    data-subjects="<?php echo implode(", ", json_decode($course['required_subjects'], true)); ?>">Edit</a>
-                    
-                    <a href="manage_courses.php?delete=<?php echo $course['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')">Delete</a>
+                        data-id="<?php echo $course['id']; ?>"
+                        data-name="<?php echo htmlspecialchars($course['course_name']); ?>"
+                        data-university="<?php echo htmlspecialchars($course['university']); ?>"
+                        data-grade="<?php echo htmlspecialchars($course['min_grade']); ?>"
+                        data-subjects="<?php echo htmlspecialchars(implode(", ", json_decode($course['required_subjects'], true))); ?>">Edit</a>
+
+                    <a href="manage_courses.php?delete=<?php echo $course['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this course?')">Delete</a>
                 </div>
             </td>
-
         </tr>
         <?php endforeach; ?>
     </table>
@@ -114,7 +146,8 @@ $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
     document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             document.getElementById('course_id').value = this.dataset.id;
             document.getElementById('course_name').value = this.dataset.name;
             document.getElementById('university').value = this.dataset.university;
